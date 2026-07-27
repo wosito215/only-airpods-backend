@@ -1,0 +1,5 @@
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
+.form-control { width: 100%; background: var(--accent-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; color: var(--text-color); font-size: 1rem; outline: none; transition: 0.3s; }
+.form-control:focus { border-color: var(--text-color); }
+textarea.form-control { min-height: 150px; resize: vertical; }

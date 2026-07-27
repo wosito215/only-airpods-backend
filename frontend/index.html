@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ONLY.AIRPODS | Inicio</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+    <nav class="fixed-nav">
+        <a href="index.html" class="logo">ONLY.AIRPODS</a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Inicio</a>
+            <a href="productos.html">Catálogo</a>
+            <a href="sobre-nosotros.html">Sobre Nosotros</a>
+            <a href="soporte.html">Soporte</a>
+        </div>
+        <div class="nav-actions">
+            <!-- Botón Modo Claro/Oscuro -->
+            <button class="icon-btn" id="theme-toggle" title="Cambiar Tema">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <div class="search-box">
+                <input type="text" placeholder="Buscar...">
+            </div>
+            <button class="icon-btn cart-btn" onclick="toggleCart()">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span class="cart-badge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <h1>ONLY.AIRPODS</h1>
+        <p class="subtitle">La evolución del sonido portátil. Diseñado para envolverte.</p>
+        <div class="button-group">
+            <a href="productos.html" class="btn">Ver Catálogo</a>
+            <a href="sobre-nosotros.html" class="btn btn-outline">Conocer Más</a>
+        </div>
+    </section>
+
+    <section class="featured-section">
+        <h2>Destacados de la Temporada</h2>
+        <p class="subtitle">Los favoritos elegidos por nuestros clientes.</p>
+        <div class="featured-grid">
+            <div class="featured-card">
+                <div class="featured-img-placeholder">FOTO AIRPODS PRO 2</div>
+                <h3>AirPods Pro 2</h3>
+                <p>Cancelación de ruido extrema y sonido adaptativo de alta fidelidad.</p>
+                <a href="productos.html" class="btn">Ver Detalles</a>
+            </div>
+            <div class="featured-card">
+                <div class="featured-img-placeholder">FOTO CASE MAGSAFE</div>
+                <h3>Cases Protectores</h3>
+                <p>Diseño minimalista y máxima protección contra caídas y rayones.</p>
+                <a href="productos.html" class="btn">Ver Detalles</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>ONLY.AIRPODS</h4>
+                <p>Audio portátil de alta gama.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Catálogo</a>
+                <a href="sobre-nosotros.html">Sobre Nosotros</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <p>WhatsApp: +57 318 946 1172</p>
+                <p>soporte@onlyairpods.com</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PANEL LATERAL (CARRITO) -->
+    <div class="side-panel" id="cart-panel">
+        <button class="close-btn" onclick="toggleCart()">✕</button>
+        <h2 style="margin-bottom: 20px; font-size: 1.8rem;">Tu Carrito</h2>
+        <ul class="cart-items" id="cart-items-list"></ul>
+        <div class="cart-footer">
+            <h3 class="total-display"><span>Total:</span> <span>$<span id="cart-total">0</span></span></h3>
+            <!-- Cambiamos el botón aquí -->
+            <button class="btn" style="width: 100%; padding: 15px; background-color: var(--text-color); color: var(--bg-color);" onclick="openCheckoutModal()">Continuar Compra</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHECKOUT (NUEVO FORMULARIO) -->
+    <div class="modal-overlay" id="checkout-modal">
+        <div class="modal-content" style="max-width: 500px; display: block;">
+            <button class="close-modal" onclick="closeCheckoutModal()">✕</button>
+            <h2 style="margin-bottom: 20px;">Completa tu Pedido</h2>
+            <form onsubmit="processOrder(event)">
+                <div class="form-group">
+                    <label>Nombre completo:</label>
+                    <input type="text" id="order-name" class="form-control" placeholder="Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Número de contacto:</label>
+                    <input type="tel" id="order-phone" class="form-control" placeholder="300 000 0000" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección (Barrio, Calle, Especificaciones):</label>
+                    <input type="text" id="order-address" class="form-control" placeholder="Calle 1 #2-3, Conjunto X" required>
+                </div>
+                <div class="form-group">
+                    <label>Método de pago:</label>
+                    <select id="order-payment" class="form-control" required style="cursor: pointer;">
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="Efectivo (Pago contra entrega en Santa Marta)">Efectivo (Pago contra entrega en Santa Marta)</option>
+                        <option value="Transferencia (Nequi o Bancolombia)">Transferencia (Nequi o Bancolombia)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px; background-color: #25D366; color: white; padding: 15px; font-size: 1.1rem;">
+                    Enviar Pedido por WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

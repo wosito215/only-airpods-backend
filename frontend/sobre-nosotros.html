@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ONLY.AIRPODS | Sobre Nosotros</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/sobre-nosotros.css">
+</head>
+<body>
+
+    <nav class="fixed-nav">
+        <a href="index.html" class="logo">ONLY.AIRPODS</a>
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="productos.html">Catálogo</a>
+            <a href="sobre-nosotros.html" class="active">Sobre Nosotros</a>
+            <a href="soporte.html">Soporte</a>
+        </div>
+        <div class="nav-actions">
+            <button class="icon-btn" id="theme-toggle"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg></button>
+            <div class="search-box"><input type="text" placeholder="Buscar..."></div>
+            <button class="icon-btn cart-btn" onclick="toggleCart()">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span class="cart-badge">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div style="text-align: center;">
+            <h1>Nuestra Historia</h1>
+            <p class="subtitle">Innovación y sonido premium, directo a ti.</p>
+        </div>
+        <div class="info-grid">
+            <div>
+                <h2>¿Quiénes somos?</h2>
+                <p style="color: var(--text-muted); line-height: 1.8;">Nacimos de la pasión por la tecnología de alta fidelidad. Curamos el mejor ecosistema de audio y accesorios para ti.</p>
+                <div class="vision-mission">
+                    <h3>Nuestra Visión</h3>
+                    <p style="color: var(--text-muted);">Ser el referente número uno en distribución de tecnología portable.</p>
+                </div>
+            </div>
+            <div>
+                <h2>Nuestra Ubicación</h2>
+                <div class="map-placeholder">[ MAPA GOOGLE MAPS ]</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer"><div class="footer-content"><div class="footer-col"><h4>ONLY.AIRPODS</h4></div></div></footer>
+
+    <!-- PANEL LATERAL (CARRITO) -->
+    <div class="side-panel" id="cart-panel">
+        <button class="close-btn" onclick="toggleCart()">✕</button>
+        <h2 style="margin-bottom: 20px; font-size: 1.8rem;">Tu Carrito</h2>
+        <ul class="cart-items" id="cart-items-list"></ul>
+        <div class="cart-footer">
+            <h3 class="total-display"><span>Total:</span> <span>$<span id="cart-total">0</span></span></h3>
+            <!-- Cambiamos el botón aquí -->
+            <button class="btn" style="width: 100%; padding: 15px; background-color: var(--text-color); color: var(--bg-color);" onclick="openCheckoutModal()">Continuar Compra</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHECKOUT (NUEVO FORMULARIO) -->
+    <div class="modal-overlay" id="checkout-modal">
+        <div class="modal-content" style="max-width: 500px; display: block;">
+            <button class="close-modal" onclick="closeCheckoutModal()">✕</button>
+            <h2 style="margin-bottom: 20px;">Completa tu Pedido</h2>
+            <form onsubmit="processOrder(event)">
+                <div class="form-group">
+                    <label>Nombre completo:</label>
+                    <input type="text" id="order-name" class="form-control" placeholder="Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Número de contacto:</label>
+                    <input type="tel" id="order-phone" class="form-control" placeholder="300 000 0000" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección (Barrio, Calle, Especificaciones):</label>
+                    <input type="text" id="order-address" class="form-control" placeholder="Calle 1 #2-3, Conjunto X" required>
+                </div>
+                <div class="form-group">
+                    <label>Método de pago:</label>
+                    <select id="order-payment" class="form-control" required style="cursor: pointer;">
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="Efectivo (Pago contra entrega en Santa Marta)">Efectivo (Pago contra entrega en Santa Marta)</option>
+                        <option value="Transferencia (Nequi o Bancolombia)">Transferencia (Nequi o Bancolombia)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px; background-color: #25D366; color: white; padding: 15px; font-size: 1.1rem;">
+                    Enviar Pedido por WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
