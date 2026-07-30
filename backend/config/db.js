@@ -1,20 +1,16 @@
 const mongoose = require('mongoose');
 
-async function connectDB() {
-    const uri = process.env.MONGODB_URI;
-
-    if (!uri) {
-        console.error('❌ Falta la variable de entorno MONGODB_URI. Revisa tu archivo .env');
-        process.exit(1);
-    }
-
-    try {
-        await mongoose.connect(uri);
-        console.log('✅ Conectado a MongoDB Atlas');
-    } catch (error) {
-        console.error('❌ Error al conectar con MongoDB:', error.message);
-        process.exit(1);
-    }
-}
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Conectado: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
 module.exports = connectDB;
