@@ -258,3 +258,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- INICIALIZACIÓN DEL CATÁLOGO (fetch al backend) ---
 document.addEventListener('DOMContentLoaded', initCatalog);
+
+const response = await fetch(`${API_URL}/api/products`);
