@@ -18,7 +18,7 @@ let productsCache = [];
 
 async function fetchProducts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/products`);
+        const response = await fetch(`${API_URL}/api/products`);
         if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
         const products = await response.json();
         productsCache = products;
