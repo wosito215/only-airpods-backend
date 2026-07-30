@@ -1,11 +1,11 @@
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']); // Forzar los DNS públicos de Google
+
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB Conectado: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
