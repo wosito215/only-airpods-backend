@@ -1,8 +1,19 @@
 require('dotenv').config();
 
 const express = require('express');
+
 const cors = require('cors');
+
+// Opción 1: Permitir cualquier origen (la más rápida para evitar bloqueos)
 app.use(cors());
+
+// O Opción 2: Especificar exactamente tu Vercel (más seguro)
+/*
+app.use(cors({
+  origin: 'https://only-airpods-backend-llp6.vercel.app',
+  credentials: true
+}));
+*/
 const connectDB = require('./config/db');
 
 const productRoutes = require('./routes/products');
