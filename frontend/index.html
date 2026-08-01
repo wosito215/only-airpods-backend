@@ -9,7 +9,10 @@
 <body>
 
     <nav class="fixed-nav">
-        <a href="index.html" class="logo">ONLY.AIRPODS</a>
+        <a href="index.html" class="nav-brand">
+            <img src="img/logo.png" alt="Only.Airpods" class="brand-logo">
+            <span class="logo">ONLY.AIRPODS</span>
+        </a>
         <div class="nav-links">
             <a href="index.html" class="active">Inicio</a>
             <a href="productos.html">Catálogo</a>
@@ -32,11 +35,29 @@
     </nav>
 
     <section class="hero-section">
-        <h1>ONLY.AIRPODS</h1>
-        <p class="subtitle">La evolución del sonido portátil. Diseñado para envolverte.</p>
-        <div class="button-group">
-            <a href="productos.html" class="btn">Ver Catálogo</a>
-            <a href="sobre-nosotros.html" class="btn btn-outline">Conocer Más</a>
+        <div class="hero-content">
+            <h1>ONLY.AIRPODS</h1>
+            <p class="hero-tagline">Conéctate al mejor sonido, y obtén una nueva experiencia envolvente.</p>
+            <p class="subtitle">AirPods Pro, MagSafe, cargadores y accesorios originales — directo a tu puerta en Santa Marta.</p>
+            <div class="button-group">
+                <a href="productos.html" class="btn">Ver Catálogo</a>
+                <a href="sobre-nosotros.html" class="btn btn-outline">Conocer Más</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <svg viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="150" cy="170" r="145" fill="none" stroke="currentColor" stroke-width="1" opacity="0.15"></circle>
+                <circle cx="150" cy="170" r="120" fill="none" stroke="currentColor" stroke-width="1" opacity="0.25"></circle>
+                <circle cx="150" cy="170" r="95" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35"></circle>
+                <rect x="75" y="30" width="150" height="110" rx="34" transform="rotate(-10 150 85)" fill="none" stroke="currentColor" stroke-width="3"></rect>
+                <line x1="150" y1="120" x2="150" y2="142" stroke="currentColor" stroke-width="3"></line>
+                <rect x="70" y="142" width="160" height="148" rx="38" fill="var(--bg-color)" stroke="currentColor" stroke-width="3"></rect>
+                <rect x="108" y="172" width="15" height="72" rx="7.5" fill="none" stroke="currentColor" stroke-width="2.5"></rect>
+                <ellipse cx="115.5" cy="168" rx="17" ry="21" fill="none" stroke="currentColor" stroke-width="2.5"></ellipse>
+                <rect x="177" y="172" width="15" height="72" rx="7.5" fill="none" stroke="currentColor" stroke-width="2.5"></rect>
+                <ellipse cx="184.5" cy="168" rx="17" ry="21" fill="none" stroke="currentColor" stroke-width="2.5"></ellipse>
+                <circle cx="150" cy="270" r="3.5" fill="currentColor"></circle>
+            </svg>
         </div>
     </section>
 
@@ -45,15 +66,49 @@
         <p class="subtitle">Los favoritos elegidos por nuestros clientes.</p>
         <div class="featured-grid">
             <div class="featured-card">
-                <div class="featured-img-placeholder">FOTO AIRPODS PRO 2</div>
+                <div class="featured-img-placeholder">
+                    <svg class="icon-illustration" viewBox="0 0 120 120" aria-hidden="true">
+                        <ellipse cx="60" cy="38" rx="20" ry="24" fill="none" stroke="currentColor" stroke-width="3"></ellipse>
+                        <rect x="52" y="40" width="16" height="56" rx="8" fill="none" stroke="currentColor" stroke-width="3"></rect>
+                    </svg>
+                </div>
                 <h3>AirPods Pro 2</h3>
                 <p>Cancelación de ruido extrema y sonido adaptativo de alta fidelidad.</p>
                 <a href="productos.html" class="btn">Ver Detalles</a>
             </div>
             <div class="featured-card">
-                <div class="featured-img-placeholder">FOTO CASE MAGSAFE</div>
-                <h3>Cases Protectores</h3>
-                <p>Diseño minimalista y máxima protección contra caídas y rayones.</p>
+                <div class="featured-img-placeholder">
+                    <svg class="icon-illustration" viewBox="0 0 120 120" aria-hidden="true">
+                        <ellipse cx="60" cy="36" rx="21" ry="25" fill="none" stroke="currentColor" stroke-width="3"></ellipse>
+                        <rect x="51" y="38" width="18" height="58" rx="9" fill="none" stroke="currentColor" stroke-width="3"></rect>
+                        <circle cx="60" cy="30" r="5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                    </svg>
+                </div>
+                <h3>AirPods Pro 3 &amp; Serie 4</h3>
+                <p>Lo último en audio inalámbrico Apple, con estuche de carga incluido.</p>
+                <a href="productos.html" class="btn">Ver Detalles</a>
+            </div>
+            <div class="featured-card">
+                <div class="featured-img-placeholder">
+                    <svg class="icon-illustration" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle cx="60" cy="52" r="27" fill="none" stroke="currentColor" stroke-width="3"></circle>
+                        <circle cx="60" cy="52" r="11" fill="none" stroke="currentColor" stroke-width="2.5"></circle>
+                        <path d="M60 79 C60 98, 42 94, 42 108" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+                <h3>MagSafe &amp; Cargadores</h3>
+                <p>Cargadores originales y genéricos, compatibles con toda la línea Apple.</p>
+                <a href="productos.html" class="btn">Ver Detalles</a>
+            </div>
+            <div class="featured-card">
+                <div class="featured-img-placeholder">
+                    <svg class="icon-illustration" viewBox="0 0 120 120" aria-hidden="true">
+                        <rect x="34" y="18" width="52" height="92" rx="17" fill="none" stroke="currentColor" stroke-width="3"></rect>
+                        <circle cx="60" cy="34" r="6" fill="none" stroke="currentColor" stroke-width="2.5"></circle>
+                    </svg>
+                </div>
+                <h3>Cases &amp; Smartwatches</h3>
+                <p>Protege tus AirPods con estilo y descubre nuestra línea de smartwatches.</p>
                 <a href="productos.html" class="btn">Ver Detalles</a>
             </div>
         </div>
@@ -63,20 +118,29 @@
         <div class="footer-content">
             <div class="footer-col">
                 <h4>ONLY.AIRPODS</h4>
-                <p>Audio portátil de alta gama.</p>
+                <p>Audio portátil de alta gama y accesorios originales, en Santa Marta.</p>
             </div>
             <div class="footer-col">
                 <h4>Navegación</h4>
                 <a href="index.html">Inicio</a>
                 <a href="productos.html">Catálogo</a>
                 <a href="sobre-nosotros.html">Sobre Nosotros</a>
+                <a href="soporte.html">Soporte</a>
             </div>
             <div class="footer-col">
                 <h4>Contacto</h4>
-                <p>WhatsApp: +57 318 946 1172</p>
-                <p>soporte@onlyairpods.com</p>
+                <a href="https://wa.me/573189461172" target="_blank" rel="noopener">WhatsApp: +57 318 946 1172</a>
+                <a href="https://wa.me/573004682749" target="_blank" rel="noopener">WhatsApp: +57 300 468 2749</a>
+                <a href="mailto:Only.airpods0@gmail.com">Only.airpods0@gmail.com</a>
+                <a href="https://www.instagram.com/only.airpods__" target="_blank" rel="noopener">Instagram: @only.airpods__</a>
+                <a href="https://www.facebook.com/share/19CtqscK8M/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+            </div>
+            <div class="footer-col">
+                <h4>Patrocinadores</h4>
+                <a href="https://www.instagram.com/elite.voleyclub" target="_blank" rel="noopener">Elite Club</a>
             </div>
         </div>
+        <p class="footer-bottom">© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
     </footer>
 
     <!-- PANEL LATERAL (CARRITO) -->

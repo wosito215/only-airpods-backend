@@ -3,3 +3,7 @@
 .form-control { width: 100%; background: var(--accent-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; color: var(--text-color); font-size: 1rem; outline: none; transition: 0.3s; }
 .form-control:focus { border-color: var(--text-color); }
 textarea.form-control { min-height: 150px; resize: vertical; }
+
+.help-note { margin-top: 35px; padding-top: 25px; border-top: 1px solid var(--border-color); }
+.help-note h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.help-note p { line-height: 1.6; }

@@ -9,7 +9,10 @@
 <body>
 
     <nav class="fixed-nav">
-        <a href="index.html" class="logo">ONLY.AIRPODS</a>
+        <a href="index.html" class="nav-brand">
+            <img src="img/logo.png" alt="Only.Airpods" class="brand-logo">
+            <span class="logo">ONLY.AIRPODS</span>
+        </a>
         <div class="nav-links">
             <a href="index.html">Inicio</a>
             <a href="productos.html">Catálogo</a>
@@ -17,7 +20,7 @@
             <a href="soporte.html" class="active">Soporte</a>
         </div>
         <div class="nav-actions">
-            <button class="icon-btn" id="theme-toggle"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg></button>
+            <button class="icon-btn" id="theme-toggle" title="Cambiar Tema"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></button>
             <div class="search-box"><input type="text" placeholder="Buscar..."></div>
             <button class="icon-btn cart-btn" onclick="toggleCart()">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
@@ -48,11 +51,42 @@
                 <h2>Asistencia Inmediata</h2>
                 <p style="color: var(--text-muted); margin-bottom: 30px;">Si prefieres una respuesta en tiempo real, escríbenos a WhatsApp.</p>
                 <button class="btn" style="background-color: #25D366; color: white;" onclick="window.open('https://wa.me/573189461172', '_blank')">Chat por WhatsApp</button>
+                <div class="help-note">
+                    <h3>¿Tienes otra duda?</h3>
+                    <p style="color: var(--text-muted);">Nos gustaría ayudarte a resolver todo tipo de inquietudes: garantías, tiempos de entrega, cambios, disponibilidad de productos o cualquier otra pregunta sobre tu compra. Comunícate con nosotros por WhatsApp o correo y con gusto te atenderemos.</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <footer class="footer"><div class="footer-content"><div class="footer-col"><h4>ONLY.AIRPODS</h4></div></div></footer>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>ONLY.AIRPODS</h4>
+                <p>Audio portátil de alta gama y accesorios originales, en Santa Marta.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Catálogo</a>
+                <a href="sobre-nosotros.html">Sobre Nosotros</a>
+                <a href="soporte.html">Soporte</a>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <a href="https://wa.me/573189461172" target="_blank" rel="noopener">WhatsApp: +57 318 946 1172</a>
+                <a href="https://wa.me/573004682749" target="_blank" rel="noopener">WhatsApp: +57 300 468 2749</a>
+                <a href="mailto:Only.airpods0@gmail.com">Only.airpods0@gmail.com</a>
+                <a href="https://www.instagram.com/only.airpods__" target="_blank" rel="noopener">Instagram: @only.airpods__</a>
+                <a href="https://www.facebook.com/share/19CtqscK8M/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+            </div>
+            <div class="footer-col">
+                <h4>Patrocinadores</h4>
+                <a href="https://www.instagram.com/elite.voleyclub" target="_blank" rel="noopener">Elite Club</a>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
+    </footer>
 
     <!-- PANEL LATERAL (CARRITO) -->
     <div class="side-panel" id="cart-panel">

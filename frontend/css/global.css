@@ -47,6 +47,8 @@ p.subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 30px; l
 
 /* --- NAVEGACIÓN --- */
 .fixed-nav { position: fixed; top: 0; width: 100%; height: 60px; background: var(--nav-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 5%; z-index: 1000; border-bottom: 1px solid var(--border-color); transition: background-color var(--transition-smooth); }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-logo { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: #ffffff; border: 1px solid var(--border-color); flex-shrink: 0; }
 .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; color: var(--text-color); text-decoration: none; }
 .nav-links { display: flex; gap: 30px; }
 .nav-links a { color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.3s ease; opacity: 0.6; }
@@ -89,7 +91,9 @@ p.subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 30px; l
 .footer { background: var(--footer-bg); padding: 60px 5% 20px; margin-top: 50px; border-top: 1px solid var(--border-color); transition: background-color var(--transition-smooth); }
 .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px; }
 .footer-col h4 { color: var(--text-color); margin-bottom: 15px; font-size: 1rem; }
-.footer-col a, .footer-col p { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; font-size: 0.9rem; }
+.footer-col a, .footer-col p { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; font-size: 0.9rem; transition: 0.2s ease; }
+.footer-col a:hover { color: var(--text-color); }
+.footer-bottom { text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-top: 25px; margin-top: 5px; border-top: 1px solid var(--border-color); }
 
 /* --- ESTRUCTURA INTERNA COMÚN (Corrección de diseño) --- */
 .page-container { 
