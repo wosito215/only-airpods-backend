@@ -11,6 +11,19 @@ if(themeToggleBtn) {
     });
 }
 
+// --- MENÚ MÓVIL (HAMBURGUESA) ---
+const menuToggleBtn = document.getElementById('menu-toggle');
+const navLinksEl = document.getElementById('nav-links');
+if (menuToggleBtn && navLinksEl) {
+    menuToggleBtn.addEventListener('click', () => {
+        navLinksEl.classList.toggle('open');
+    });
+    // Cierra el menú al tocar un enlace
+    navLinksEl.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => navLinksEl.classList.remove('open'));
+    });
+}
+
 // --- PRODUCTOS: AHORA VIENEN DEL BACKEND (MongoDB), YA NO HAY productsDB LOCAL ---
 // productsCache guarda en memoria la última lista de productos que trajo el backend,
 // para no tener que volver a pedirla cada vez que se abre un modal o se filtra la búsqueda.
@@ -67,6 +80,13 @@ async function initCatalog() {
         return;
     }
     renderCatalog(products);
+
+    // Si llegamos desde otra página con ?search=algo en la URL, filtramos automáticamente
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('search');
+    if (initialQuery) {
+        applySearchFilter(initialQuery);
+    }
 }
 
 // --- LOGICA DEL MODAL DEL CATÁLOGO ---
@@ -228,29 +248,68 @@ function filterCategory(category) {
 // --- BARRA DE BÚSQUEDA DINÁMICA ---
 // Filtra sobre los productos ya cargados desde el backend (productsCache),
 // sin necesidad de volver a golpear la base de datos en cada tecla.
+
+// Aplica el filtro de búsqueda sobre las tarjetas ya pintadas en #catalog-grid
+function applySearchFilter(query) {
+    const grid = document.getElementById('catalog-grid');
+    if (!grid) return;
+
+    const q = query.toLowerCase().trim();
+    const productItems = grid.querySelectorAll('.product-item');
+    let anyVisible = false;
+
+    productItems.forEach(item => {
+        const title = item.querySelector('h3')?.innerText.toLowerCase() || '';
+        const desc = item.querySelector('p')?.innerText.toLowerCase() || '';
+        const matches = q === '' || title.includes(q) || desc.includes(q);
+        item.style.display = matches ? 'block' : 'none';
+        if (matches) anyVisible = true;
+    });
+
+    // Mensaje de "sin resultados" cuando la búsqueda no encuentra nada
+    let emptyMsg = grid.querySelector('.search-empty-msg');
+    if (!anyVisible && q !== '' && productItems.length > 0) {
+        if (!emptyMsg) {
+            emptyMsg = document.createElement('p');
+            emptyMsg.className = 'catalog-empty search-empty-msg';
+            grid.appendChild(emptyMsg);
+        }
+        emptyMsg.textContent = `No encontramos productos para "${query}".`;
+    } else if (emptyMsg) {
+        emptyMsg.remove();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchInputs = document.querySelectorAll('.search-box input');
+    const onCatalogPage = document.getElementById('catalog-grid') !== null;
+
+    // Si venimos de otra página con ?search=, precargamos el término en el buscador
+    const urlParams = new URLSearchParams(window.location.search);
+    const incomingQuery = urlParams.get('search');
+    if (incomingQuery) {
+        searchInputs.forEach(input => { input.value = incomingQuery; });
+    }
 
     searchInputs.forEach(input => {
+        // Mientras se escribe: si ya estamos en el catálogo, filtra en vivo
         input.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            
-            // Si estamos en la página de catálogo, filtramos los elementos visuales
-            const productItems = document.querySelectorAll('.product-item');
-            if (productItems.length > 0) {
-                productItems.forEach(item => {
-                    const title = item.querySelector('h3').innerText.toLowerCase();
-                    const desc = item.querySelector('p').innerText.toLowerCase();
-                    
-                    if (title.includes(query) || desc.includes(query)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+            if (onCatalogPage) {
+                applySearchFilter(e.target.value);
+            }
+        });
+
+        // Al presionar Enter: si NO estamos en el catálogo, redirige con la búsqueda
+        input.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const query = e.target.value.trim();
+            if (onCatalogPage) {
+                applySearchFilter(query);
             } else if (query.length > 0) {
-                // Si escriben desde el Inicio u otra página, los redirigimos al catálogo con la búsqueda
-                // (Opcional avanzado, por ahora filtra el catálogo localmente)
+                window.location.href = `productos.html?search=${encodeURIComponent(query)}`;
+            } else {
+                window.location.href = 'productos.html';
             }
         });
     });
