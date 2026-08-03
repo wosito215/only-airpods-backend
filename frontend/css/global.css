@@ -124,7 +124,7 @@ p.subtitle { font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-muted); marg
 @media (max-width: 768px) {
     .fixed-nav { padding: 0 4%; }
     .nav-brand { gap: 8px; }
-    .brand-logo { width: 39px; height: 39px; }
+    .brand-logo { width: 30px; height: 30px; }
     .logo { font-size: 1rem; letter-spacing: 1px; margin-right: 0; }
     .nav-actions { gap: 8px; }
 
