@@ -44,14 +44,14 @@
         <div class="info-grid">
             <div style="background: var(--accent-bg); padding: 40px; border-radius: 20px; border: 1px solid var(--border-color);">
                 <h3 style="margin-bottom: 25px;">Envíanos un mensaje</h3>
-                <form>
+                <form onsubmit="sendSupportMessage(event)">
                     <div class="form-group">
-                        <label>Nombre</label><input type="text" class="form-control" required>
+                        <label>Nombre</label><input type="text" id="support-name" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Mensaje</label><textarea class="form-control" required></textarea>
+                        <label>Mensaje</label><textarea id="support-message" class="form-control" required></textarea>
                     </div>
-                    <button class="btn" style="width: 100%;">Enviar</button>
+                    <button class="btn" style="width: 100%; background-color: #25D366; color: white;" type="submit">Enviar por WhatsApp</button>
                 </form>
             </div>
             <div>
@@ -92,7 +92,10 @@
                 <a href="https://www.instagram.com/elite.voleyclub" target="_blank" rel="noopener">Elite Club</a>
             </div>
         </div>
-        <p class="footer-bottom">© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
+        <div class="footer-bottom">
+        <p>© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
+        <img src="img/logo.png" alt="Only.Airpods" class="footer-logo">
+    </div>
     </footer>
 
     <!-- PANEL LATERAL (CARRITO) -->

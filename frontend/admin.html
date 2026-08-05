@@ -23,11 +23,24 @@
     <div class="admin-wrapper" id="dashboard-screen" style="display:none;">
 
         <div class="admin-header">
-            <h1 style="font-size:2rem;">Productos</h1>
+            <h1 style="font-size:2rem;">Panel de Administración</h1>
             <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
         </div>
 
-        <!-- Añadir producto -->
+        <!-- ---------- CATEGORÍAS ---------- -->
+        <div class="admin-card">
+            <h3>Categorías</h3>
+            <p class="admin-hint">Crea las categorías que necesites (ej: Cámaras, Relojes, Cargadores). Aparecerán automáticamente en el catálogo y en el formulario de productos.</p>
+            <div class="category-chip-list" id="category-chip-list"></div>
+            <div class="admin-inline-form">
+                <input type="text" id="new-category-name" class="form-control-admin" placeholder="Nombre de la nueva categoría (ej: Cámaras)">
+                <button class="btn-small btn-save" onclick="createCategory()">+ Añadir categoría</button>
+            </div>
+            <p class="admin-error" id="category-error"></p>
+            <p class="admin-success" id="category-success"></p>
+        </div>
+
+        <!-- ---------- AÑADIR PRODUCTO ---------- -->
         <div class="admin-card">
             <h3>Añadir nuevo producto</h3>
             <div class="admin-form-grid">
@@ -35,32 +48,41 @@
                 <input type="text" id="new-name" class="form-control-admin" placeholder="Nombre">
                 <input type="number" id="new-price" class="form-control-admin" placeholder="Precio">
                 <input type="number" id="new-stock" class="form-control-admin" placeholder="Stock">
-                <select id="new-category" class="form-control-admin">
-                    <option value="airpods">airpods</option>
-                    <option value="cases">cases</option>
-                    <option value="otros">otros</option>
-                </select>
-                <input type="text" id="new-image" class="form-control-admin" placeholder="URL de imagen (opcional)">
+                <select id="new-category" class="form-control-admin"></select>
+                <label class="featured-check">
+                    <input type="checkbox" id="new-featured">
+                    Mostrar en Destacados (pantalla principal)
+                </label>
                 <input type="text" id="new-desc" class="form-control-admin full-width" placeholder="Descripción">
                 <input type="text" id="new-box" class="form-control-admin full-width" placeholder="Contenido de la caja, separado por comas">
             </div>
-            <button class="btn-small btn-save" onclick="createProduct()">+ Crear producto</button>
+
+            <div class="image-upload-block full-width">
+                <label class="image-upload-label">Fotos del producto (hasta 4, se suben directo desde tu dispositivo)</label>
+                <div class="image-upload-grid" id="new-image-grid"></div>
+                <p class="admin-hint" style="margin-top:8px;">La primera foto que subas será la foto principal del catálogo.</p>
+            </div>
+
+            <button class="btn-small btn-save" onclick="createProduct()" style="margin-top:15px;">+ Crear producto</button>
             <p class="admin-error" id="create-error"></p>
             <p class="admin-success" id="create-success"></p>
         </div>
 
-        <!-- Lista de productos existentes -->
+        <!-- ---------- INVENTARIO ---------- -->
         <div class="admin-card">
             <h3>Inventario actual</h3>
             <div class="admin-table-wrapper">
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Foto</th>
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Precio</th>
                             <th>Stock</th>
                             <th>Categoría</th>
+                            <th>Destacado</th>
+                            <th>Activo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -73,15 +95,34 @@
         </div>
     </div>
 
-    <style>
-        .form-control-admin {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            color: var(--text-color);
-        }
-    </style>
+    <!-- ---------- MODAL: EDITAR PRODUCTO (nombre, desc, categoría, imágenes, caja) ---------- -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content" style="max-width:700px;">
+            <button class="close-modal" onclick="closeEditModal()">✕</button>
+            <h2 style="margin-bottom:20px;">Editar producto</h2>
+            <input type="hidden" id="edit-id">
+            <div class="admin-form-grid">
+                <input type="text" id="edit-name" class="form-control-admin full-width" placeholder="Nombre">
+                <input type="number" id="edit-price" class="form-control-admin" placeholder="Precio">
+                <input type="number" id="edit-stock" class="form-control-admin" placeholder="Stock">
+                <select id="edit-category" class="form-control-admin"></select>
+                <label class="featured-check">
+                    <input type="checkbox" id="edit-featured">
+                    Mostrar en Destacados
+                </label>
+                <input type="text" id="edit-desc" class="form-control-admin full-width" placeholder="Descripción">
+                <input type="text" id="edit-box" class="form-control-admin full-width" placeholder="Contenido de la caja, separado por comas">
+            </div>
+
+            <div class="image-upload-block full-width">
+                <label class="image-upload-label">Fotos del producto (hasta 4)</label>
+                <div class="image-upload-grid" id="edit-image-grid"></div>
+            </div>
+
+            <button class="btn-small btn-save" onclick="saveProductFull()" style="margin-top:15px;">Guardar cambios</button>
+            <p class="admin-error" id="edit-error"></p>
+        </div>
+    </div>
 
     <script src="js/config.js"></script>
     <script src="js/admin.js"></script>

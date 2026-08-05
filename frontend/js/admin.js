@@ -3,15 +3,14 @@
 // un poco más seguro que localStorage para un panel de administración).
 
 const TOKEN_KEY = 'onlyAirpodsAdminToken';
+const MAX_IMAGES = 4;
 
 function getToken() {
     return sessionStorage.getItem(TOKEN_KEY);
 }
-
 function setToken(token) {
     sessionStorage.setItem(TOKEN_KEY, token);
 }
-
 function clearToken() {
     sessionStorage.removeItem(TOKEN_KEY);
 }
@@ -19,9 +18,9 @@ function clearToken() {
 function showDashboard() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard-screen').style.display = 'block';
+    loadCategories();
     loadProductsTable();
 }
-
 function showLogin() {
     document.getElementById('login-screen').style.display = 'block';
     document.getElementById('dashboard-screen').style.display = 'none';
@@ -84,26 +83,234 @@ async function authFetch(url, options = {}) {
     return res;
 }
 
-// --- CARGAR TABLA DE PRODUCTOS ---
+// =====================================================================
+// SUBIDA DE IMÁGENES (archivo real del dispositivo, no URL)
+// Cada imagen se redimensiona/comprime en el navegador con <canvas> antes
+// de guardarse, para no llenar la base de datos con fotos pesadas.
+// =====================================================================
+
+// Guarda en memoria las imágenes (como Data URL base64) de cada formulario.
+const imageState = {
+    new: [],
+    edit: [],
+};
+
+function compressImage(file, maxDimension = 1000, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('No se pudo leer la imagen.'));
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Archivo de imagen inválido.'));
+            img.onload = () => {
+                let { width, height } = img;
+                if (width > height && width > maxDimension) {
+                    height = Math.round(height * (maxDimension / width));
+                    width = maxDimension;
+                } else if (height > maxDimension) {
+                    width = Math.round(width * (maxDimension / height));
+                    height = maxDimension;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function renderImageGrid(key) {
+    const grid = document.getElementById(`${key}-image-grid`);
+    if (!grid) return;
+    const images = imageState[key];
+
+    let html = images.map((src, index) => `
+        <div class="image-slot filled">
+            <img src="${src}" alt="Foto ${index + 1}">
+            ${index === 0 ? '<span class="image-slot-tag">Principal</span>' : ''}
+            <button type="button" class="image-slot-remove" onclick="removeImage('${key}', ${index})" title="Quitar foto">✕</button>
+        </div>
+    `).join('');
+
+    if (images.length < MAX_IMAGES) {
+        html += `
+            <label class="image-slot add-slot">
+                <input type="file" accept="image/*" multiple onchange="handleImageSelect('${key}', event)" hidden>
+                <span>+ Añadir foto</span>
+            </label>
+        `;
+    }
+
+    grid.innerHTML = html;
+}
+
+async function handleImageSelect(key, event) {
+    const files = Array.from(event.target.files || []);
+    event.target.value = ''; // permite volver a seleccionar el mismo archivo después
+
+    for (const file of files) {
+        if (imageState[key].length >= MAX_IMAGES) break;
+        try {
+            const dataUrl = await compressImage(file);
+            imageState[key].push(dataUrl);
+        } catch (error) {
+            alert('No se pudo procesar una de las imágenes. Intenta con otra foto.');
+        }
+    }
+    renderImageGrid(key);
+}
+
+function removeImage(key, index) {
+    imageState[key].splice(index, 1);
+    renderImageGrid(key);
+}
+
+// =====================================================================
+// CATEGORÍAS
+// =====================================================================
+
+let categoriesCache = [];
+
+async function loadCategories() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/categories`);
+        categoriesCache = await res.json();
+        renderCategorySelects();
+        renderCategoryChips();
+    } catch (error) {
+        document.getElementById('category-error').innerText = 'No se pudieron cargar las categorías.';
+    }
+}
+
+function renderCategorySelects() {
+    const optionsHtml = categoriesCache.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+
+    ['new-category', 'edit-category'].forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const previousValue = select.value;
+        select.innerHTML = optionsHtml;
+        if (previousValue && categoriesCache.some(c => c.id === previousValue)) {
+            select.value = previousValue;
+        }
+    });
+}
+
+function renderCategoryChips() {
+    const container = document.getElementById('category-chip-list');
+    if (!container) return;
+
+    if (categoriesCache.length === 0) {
+        container.innerHTML = '<p class="admin-hint">Aún no has creado categorías.</p>';
+        return;
+    }
+
+    container.innerHTML = categoriesCache.map(cat => `
+        <span class="category-chip">
+            ${cat.name}
+            <button type="button" onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" title="Eliminar categoría">✕</button>
+        </span>
+    `).join('');
+}
+
+async function createCategory() {
+    const input = document.getElementById('new-category-name');
+    const errorEl = document.getElementById('category-error');
+    const successEl = document.getElementById('category-success');
+    errorEl.innerText = '';
+    successEl.innerText = '';
+
+    const name = input.value.trim();
+    if (!name) {
+        errorEl.innerText = 'Escribe un nombre para la categoría.';
+        return;
+    }
+
+    try {
+        const res = await authFetch(`${API_BASE_URL}/categories`, {
+            method: 'POST',
+            body: JSON.stringify({ name }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = data.message || 'Error al crear la categoría.';
+            return;
+        }
+
+        successEl.innerText = `Categoría "${data.name}" creada.`;
+        input.value = '';
+        await loadCategories();
+    } catch (error) {
+        errorEl.innerText = error.message || 'Error al crear la categoría.';
+    }
+}
+
+async function deleteCategory(id, name) {
+    if (!confirm(`¿Eliminar la categoría "${name}"? Solo se puede borrar si ningún producto la está usando.`)) return;
+
+    const errorEl = document.getElementById('category-error');
+    errorEl.innerText = '';
+
+    try {
+        const res = await authFetch(`${API_BASE_URL}/categories/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = data.message || 'Error al eliminar la categoría.';
+            return;
+        }
+
+        await loadCategories();
+    } catch (error) {
+        errorEl.innerText = error.message || 'Error al eliminar la categoría.';
+    }
+}
+
+// =====================================================================
+// PRODUCTOS — TABLA
+// =====================================================================
+
+let productsCache = [];
+
 async function loadProductsTable() {
     const tbody = document.getElementById('products-table-body');
     const errorEl = document.getElementById('table-error');
     errorEl.innerText = '';
 
     try {
-        // La lista de productos es pública, no requiere token
-        const res = await fetch(`${API_BASE_URL}/products`);
-        const products = await res.json();
+        // ?all=true trae también los productos desactivados, para poder reactivarlos
+        const res = await fetch(`${API_BASE_URL}/products?all=true`);
+        productsCache = await res.json();
 
-        tbody.innerHTML = products.map(product => `
-            <tr data-id="${product.id}">
+        tbody.innerHTML = productsCache.map(product => `
+            <tr data-id="${product.id}" style="${product.active ? '' : 'opacity:0.5;'}">
+                <td>
+                    <div class="table-thumb">
+                        ${product.images && product.images[0] ? `<img src="${product.images[0]}" alt="${product.name}">` : '—'}
+                    </div>
+                </td>
                 <td>${product.id}</td>
                 <td>${product.name}</td>
                 <td><input type="number" value="${product.price}" data-field="price"></td>
                 <td><input type="number" value="${product.stock}" data-field="stock" class="${product.stock <= 3 ? 'stock-low' : ''}"></td>
-                <td>${product.category}</td>
+                <td>${(categoriesCache.find(c => c.id === product.category) || {}).name || product.category}</td>
+                <td style="text-align:center;">
+                    <input type="checkbox" ${product.featured ? 'checked' : ''} onchange="toggleFeatured('${product.id}', this.checked)">
+                </td>
+                <td style="text-align:center;">
+                    <input type="checkbox" ${product.active ? 'checked' : ''} onchange="toggleActive('${product.id}', this.checked)">
+                </td>
                 <td class="table-actions">
                     <button class="btn-small btn-save" onclick="saveProduct('${product.id}')">Guardar</button>
+                    <button class="btn-small" style="background:var(--border-color); color:var(--text-color);" onclick="openEditModal('${product.id}')">Editar</button>
                     <button class="btn-small btn-delete" onclick="deleteProduct('${product.id}')">Eliminar</button>
                 </td>
             </tr>
@@ -113,7 +320,7 @@ async function loadProductsTable() {
     }
 }
 
-// --- GUARDAR CAMBIOS (precio / stock) DE UN PRODUCTO ---
+// --- GUARDAR CAMBIOS RÁPIDOS (precio / stock) DE UN PRODUCTO ---
 async function saveProduct(id) {
     const row = document.querySelector(`tr[data-id="${id}"]`);
     const price = Number(row.querySelector('[data-field="price"]').value);
@@ -136,6 +343,30 @@ async function saveProduct(id) {
         loadProductsTable();
     } catch (error) {
         errorEl.innerText = error.message || 'Error al guardar los cambios.';
+    }
+}
+
+async function toggleFeatured(id, featured) {
+    try {
+        await authFetch(`${API_BASE_URL}/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ featured }),
+        });
+    } catch (error) {
+        document.getElementById('table-error').innerText = 'No se pudo actualizar el destacado.';
+        loadProductsTable();
+    }
+}
+
+async function toggleActive(id, active) {
+    try {
+        await authFetch(`${API_BASE_URL}/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ active }),
+        });
+        loadProductsTable();
+    } catch (error) {
+        document.getElementById('table-error').innerText = 'No se pudo actualizar el estado.';
     }
 }
 
@@ -173,22 +404,27 @@ async function createProduct() {
     const price = Number(document.getElementById('new-price').value);
     const stock = Number(document.getElementById('new-stock').value);
     const category = document.getElementById('new-category').value;
-    const image = document.getElementById('new-image').value.trim();
+    const featured = document.getElementById('new-featured').checked;
     const desc = document.getElementById('new-desc').value.trim();
     const box = document.getElementById('new-box').value
         .split(',')
         .map(item => item.trim())
         .filter(Boolean);
+    const images = imageState.new;
 
     if (!id || !name || !price || stock === undefined || Number.isNaN(price)) {
         errorEl.innerText = 'Completa al menos: id, nombre, precio y stock.';
+        return;
+    }
+    if (!category) {
+        errorEl.innerText = 'Crea al menos una categoría antes de añadir productos.';
         return;
     }
 
     try {
         const res = await authFetch(`${API_BASE_URL}/products`, {
             method: 'POST',
-            body: JSON.stringify({ id, name, price, stock, category, image, desc, box }),
+            body: JSON.stringify({ id, name, price, stock, category, featured, desc, box, images }),
         });
         const data = await res.json();
 
@@ -198,20 +434,97 @@ async function createProduct() {
         }
 
         successEl.innerText = `Producto "${data.name}" creado correctamente.`;
-        ['new-id', 'new-name', 'new-price', 'new-stock', 'new-image', 'new-desc', 'new-box'].forEach(fieldId => {
+        ['new-id', 'new-name', 'new-price', 'new-stock', 'new-desc', 'new-box'].forEach(fieldId => {
             document.getElementById(fieldId).value = '';
         });
+        document.getElementById('new-featured').checked = false;
+        imageState.new = [];
+        renderImageGrid('new');
         loadProductsTable();
     } catch (error) {
         errorEl.innerText = error.message || 'Error al crear el producto.';
     }
 }
 
-// Permitir iniciar sesión con Enter
+// =====================================================================
+// EDITAR PRODUCTO (modal completo: nombre, categoría, fotos, caja...)
+// =====================================================================
+
+function openEditModal(id) {
+    const product = productsCache.find(p => p.id === id);
+    if (!product) return;
+
+    document.getElementById('edit-id').value = product.id;
+    document.getElementById('edit-name').value = product.name;
+    document.getElementById('edit-price').value = product.price;
+    document.getElementById('edit-stock').value = product.stock;
+    document.getElementById('edit-desc').value = product.desc || '';
+    document.getElementById('edit-box').value = (product.box || []).join(', ');
+    document.getElementById('edit-featured').checked = !!product.featured;
+
+    renderCategorySelects();
+    document.getElementById('edit-category').value = product.category;
+
+    imageState.edit = [...(product.images || [])];
+    renderImageGrid('edit');
+
+    document.getElementById('edit-error').innerText = '';
+    document.getElementById('edit-modal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('active');
+}
+
+async function saveProductFull() {
+    const errorEl = document.getElementById('edit-error');
+    errorEl.innerText = '';
+
+    const id = document.getElementById('edit-id').value;
+    const name = document.getElementById('edit-name').value.trim();
+    const price = Number(document.getElementById('edit-price').value);
+    const stock = Number(document.getElementById('edit-stock').value);
+    const category = document.getElementById('edit-category').value;
+    const featured = document.getElementById('edit-featured').checked;
+    const desc = document.getElementById('edit-desc').value.trim();
+    const box = document.getElementById('edit-box').value
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+    const images = imageState.edit;
+
+    if (!name || !price || Number.isNaN(price)) {
+        errorEl.innerText = 'Completa al menos: nombre y precio.';
+        return;
+    }
+
+    try {
+        const res = await authFetch(`${API_BASE_URL}/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ name, price, stock, category, featured, desc, box, images }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = data.message || 'Error al guardar los cambios.';
+            return;
+        }
+
+        closeEditModal();
+        loadProductsTable();
+    } catch (error) {
+        errorEl.innerText = error.message || 'Error al guardar los cambios.';
+    }
+}
+
+// --- Permitir iniciar sesión con Enter + estado inicial ---
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-password').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') login();
     });
+
+    renderImageGrid('new');
+    renderImageGrid('edit');
 
     // Si ya hay un token guardado en esta pestaña, entra directo al dashboard
     if (getToken()) {

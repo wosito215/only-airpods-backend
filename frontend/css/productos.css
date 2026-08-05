@@ -19,7 +19,8 @@
 .close-modal:hover { transform: rotate(90deg); }
 .modal-gallery { display: flex; flex-direction: column; gap: 10px; }
 .modal-thumbnails { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.modal-thumbnails .img-placeholder { margin: 0; aspect-ratio: 1; cursor: pointer; border: 2px solid transparent; }
+.modal-thumbnails .img-placeholder { margin: 0; aspect-ratio: 1; cursor: pointer; border: 2px solid transparent; overflow: hidden; }
+.modal-thumb.active { border-color: var(--text-color); }
 .modal-price { font-size: 1.5rem; font-weight: 600; margin-bottom: 20px; display: block; color: var(--text-color); }
 .modal-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
 .modal-box-contents h4 { margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }

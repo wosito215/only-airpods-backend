@@ -52,10 +52,12 @@ function renderCatalog(products) {
         return;
     }
 
-    grid.innerHTML = products.map(product => `
+    grid.innerHTML = products.map(product => {
+        const mainImage = product.images && product.images.length > 0 ? product.images[0] : '';
+        return `
         <div class="product-item" data-category="${product.category}" onclick="openProductModal('${product.id}')">
             <div class="img-placeholder">
-                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">` : 'FOTO PRODUCTO'}
+                ${mainImage ? `<img src="${mainImage}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">` : 'FOTO PRODUCTO'}
             </div>
             <div class="product-info">
                 <h3>${product.name}</h3>
@@ -64,7 +66,62 @@ function renderCatalog(products) {
                 ${product.stock <= 0 ? '<span class="stock-badge" style="display:block;color:#e0245e;font-size:0.85rem;margin-top:5px;">Agotado</span>' : ''}
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+// --- FILTROS DE CATEGORÍA DINÁMICOS ---
+// Antes eran botones fijos (Todos/AirPods/Cases). Ahora se generan según las
+// categorías creadas desde el admin, para que nuevas líneas de producto
+// (ej. cámaras, relojes) aparezcan solas en el catálogo.
+async function initCategoryFilters() {
+    const container = document.getElementById('category-filters');
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/categories`);
+        if (!response.ok) return;
+        const categories = await response.json();
+
+        const buttonsHtml = categories.map(cat =>
+            `<button class="filter-btn" onclick="filterCategory('${cat.id}')">${cat.name}</button>`
+        ).join('');
+
+        container.innerHTML = `<button class="filter-btn active" onclick="filterCategory('todos')">Todos</button>${buttonsHtml}`;
+    } catch (error) {
+        console.error('No se pudieron cargar las categorías:', error);
+    }
+}
+
+// --- DESTACADOS DE LA PANTALLA PRINCIPAL ---
+// Se administran marcando productos como "Destacado" desde el panel de admin.
+// Si todavía no hay ninguno marcado, se deja el contenido ilustrativo por defecto.
+async function initFeatured() {
+    const grid = document.getElementById('featured-grid');
+    if (!grid) return;
+
+    const products = productsCache.length > 0 ? productsCache : await fetchProducts();
+    if (!products) return;
+
+    const featured = products.filter(p => p.featured).slice(0, 4);
+    if (featured.length === 0) return; // deja el contenido ilustrativo original
+
+    grid.innerHTML = featured.map(product => {
+        const mainImage = product.images && product.images.length > 0 ? product.images[0] : '';
+        return `
+        <div class="featured-card">
+            <div class="featured-img-placeholder">
+                ${mainImage
+                    ? `<img src="${mainImage}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`
+                    : `<svg class="icon-illustration" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="38" rx="20" ry="24" fill="none" stroke="currentColor" stroke-width="3"></ellipse><rect x="52" y="40" width="16" height="56" rx="8" fill="none" stroke="currentColor" stroke-width="3"></rect></svg>`
+                }
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.desc || ''}</p>
+            <a href="productos.html?search=${encodeURIComponent(product.name)}" class="btn">Ver Detalles</a>
+        </div>
+        `;
+    }).join('');
 }
 
 // Carga inicial del catálogo (solo hace algo si la página tiene #catalog-grid)
@@ -73,6 +130,7 @@ async function initCatalog() {
     if (!grid) return;
 
     grid.innerHTML = `<p class="catalog-empty">Cargando productos...</p>`;
+    initCategoryFilters();
     const products = await fetchProducts();
 
     if (products === null) {
@@ -98,6 +156,8 @@ function openProductModal(productId) {
     document.getElementById('modal-price').innerText = `$${product.price.toLocaleString()}`;
     document.getElementById('modal-desc').innerText = product.desc;
 
+    renderModalGallery(product.images || []);
+
     const boxList = document.getElementById('modal-box-list');
     if (boxList) {
         boxList.innerHTML = (product.box || []).map(item => `<li>${item}</li>`).join('');
@@ -117,6 +177,50 @@ function openProductModal(productId) {
     document.getElementById('product-modal').classList.add('active');
 }
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
+
+// Pinta la foto principal + miniaturas del modal con las imágenes reales del
+// producto (subidas desde el admin). Si no hay fotos, muestra el placeholder.
+function renderModalGallery(images) {
+    const mainImgEl = document.getElementById('modal-main-img');
+    const thumbsEl = document.getElementById('modal-thumbnails');
+    if (!mainImgEl || !thumbsEl) return;
+
+    function setMainImage(src) {
+        mainImgEl.innerHTML = src
+            ? `<img src="${src}" alt="Foto del producto" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+            : 'FOTO PRINCIPAL';
+    }
+
+    if (!images || images.length === 0) {
+        setMainImage('');
+        thumbsEl.innerHTML = '';
+        return;
+    }
+
+    setMainImage(images[0]);
+
+    thumbsEl.innerHTML = images.map((src, index) => `
+        <div class="img-placeholder modal-thumb ${index === 0 ? 'active' : ''}" onclick="setModalMainImage('${index}')">
+            <img src="${src}" alt="Foto ${index + 1}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+        </div>
+    `).join('');
+
+    // Guarda las imágenes actuales para poder cambiarlas al hacer clic en una miniatura
+    window.__currentModalImages = images;
+}
+
+function setModalMainImage(index) {
+    const images = window.__currentModalImages || [];
+    const src = images[index];
+    if (!src) return;
+
+    document.getElementById('modal-main-img').innerHTML =
+        `<img src="${src}" alt="Foto del producto" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`;
+
+    document.querySelectorAll('#modal-thumbnails .modal-thumb').forEach((el, i) => {
+        el.classList.toggle('active', i === Number(index));
+    });
+}
 
 // --- CARRITO DE COMPRAS AVANZADO ---
 let cart = JSON.parse(localStorage.getItem('onlyAirpodsCart')) || [];
@@ -233,6 +337,25 @@ function processOrder(e) {
     closeCheckoutModal();
 }
 
+// --- FORMULARIO DE SOPORTE -> WHATSAPP ---
+// Antes el botón "Enviar" no hacía nada (el formulario no tenía JS asociado).
+// Ahora arma el mensaje con el nombre y el texto escrito, y lo abre en WhatsApp.
+function sendSupportMessage(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('support-name').value.trim();
+    const messageText = document.getElementById('support-message').value.trim();
+
+    if (!name || !messageText) return;
+
+    const message = `Hola, soy ${name}.\n\n${messageText}`;
+    const phoneNumber = "573189461172";
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+
+    document.getElementById('support-name').value = '';
+    document.getElementById('support-message').value = '';
+}
+
 // Filtros de Catálogo
 function filterCategory(category) {
     const buttons = document.querySelectorAll('.filter-btn');
@@ -317,4 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- INICIALIZACIÓN DEL CATÁLOGO (fetch al backend) ---
 document.addEventListener('DOMContentLoaded', initCatalog);
+
+// --- INICIALIZACIÓN DE DESTACADOS (solo hace algo si existe #featured-grid) ---
+document.addEventListener('DOMContentLoaded', initFeatured);
 

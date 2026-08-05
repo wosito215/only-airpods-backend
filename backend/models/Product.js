@@ -29,9 +29,13 @@ const productSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+        // Ya no es un enum fijo: las categorías se administran dinámicamente
+        // desde el panel (modelo Category). Aquí solo guardamos el "id" (slug)
+        // de la categoría a la que pertenece el producto.
         category: {
             type: String,
-            enum: ['airpods', 'cases', 'otros'],
+            trim: true,
+            lowercase: true,
             default: 'otros',
         },
         stock: {
@@ -40,9 +44,21 @@ const productSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
-        image: {
-            type: String, // URL de la imagen (opcional, mientras tanto se usa el placeholder)
-            default: '',
+        // Imágenes subidas como archivo (se guardan como Data URL base64,
+        // ya redimensionadas/comprimidas desde el navegador antes de enviarse).
+        // images[0] es siempre la foto principal que se ve en el catálogo.
+        images: {
+            type: [String],
+            default: [],
+            validate: {
+                validator: (arr) => Array.isArray(arr) && arr.length <= 4,
+                message: 'Un producto admite máximo 4 imágenes.',
+            },
+        },
+        // Se muestra en la sección "Destacados" de la pantalla principal.
+        featured: {
+            type: Boolean,
+            default: false,
         },
         active: {
             type: Boolean,

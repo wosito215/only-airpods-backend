@@ -4,6 +4,13 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const Product = require('./models/Product');
+const Category = require('./models/Category');
+
+const initialCategories = [
+    { id: 'airpods', name: 'AirPods', order: 0 },
+    { id: 'cases', name: 'Cases', order: 1 },
+    { id: 'otros', name: 'Otros', order: 2 },
+];
 
 const initialProducts = [
     {
@@ -37,6 +44,15 @@ const initialProducts = [
 
 async function seed() {
     await connectDB();
+
+    for (const category of initialCategories) {
+        await Category.findOneAndUpdate(
+            { id: category.id },
+            category,
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        console.log(`✅ Categoría lista: ${category.name}`);
+    }
 
     for (const product of initialProducts) {
         await Product.findOneAndUpdate(

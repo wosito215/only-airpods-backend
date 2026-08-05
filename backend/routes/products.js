@@ -7,9 +7,11 @@ const router = express.Router();
 // ---------- RUTAS PÚBLICAS (las usa el frontend/main.js) ----------
 
 // GET /api/products -> lista todos los productos activos
+// ?all=true (uso interno del admin) también trae los inactivos
 router.get('/', async (req, res) => {
     try {
-        const products = await Product.find({ active: true }).sort({ createdAt: -1 });
+        const filter = req.query.all === 'true' ? {} : { active: true };
+        const products = await Product.find(filter).sort({ createdAt: -1 });
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los productos.', error: error.message });
@@ -32,10 +34,14 @@ router.get('/:id', async (req, res) => {
 // POST /api/products -> crear producto nuevo
 router.post('/', requireAuth, async (req, res) => {
     try {
-        const { id, name, price, desc, box, category, stock, image } = req.body;
+        const { id, name, price, desc, box, category, stock, images, featured } = req.body;
 
         if (!id || !name || price === undefined || stock === undefined) {
             return res.status(400).json({ message: 'Faltan campos obligatorios: id, name, price, stock.' });
+        }
+
+        if (images && Array.isArray(images) && images.length > 4) {
+            return res.status(400).json({ message: 'Un producto admite máximo 4 imágenes.' });
         }
 
         const exists = await Product.findOne({ id: id.toLowerCase().trim() });
@@ -43,7 +49,11 @@ router.post('/', requireAuth, async (req, res) => {
             return res.status(409).json({ message: `Ya existe un producto con el id "${id}".` });
         }
 
-        const product = await Product.create({ id, name, price, desc, box, category, stock, image });
+        const product = await Product.create({
+            id, name, price, desc, box, category, stock,
+            images: images || [],
+            featured: !!featured,
+        });
         res.status(201).json(product);
     } catch (error) {
         res.status(500).json({ message: 'Error al crear el producto.', error: error.message });
@@ -54,6 +64,11 @@ router.post('/', requireAuth, async (req, res) => {
 router.put('/:id', requireAuth, async (req, res) => {
     try {
         const updates = req.body;
+
+        if (updates.images && Array.isArray(updates.images) && updates.images.length > 4) {
+            return res.status(400).json({ message: 'Un producto admite máximo 4 imágenes.' });
+        }
+
         const product = await Product.findOneAndUpdate(
             { id: req.params.id },
             updates,

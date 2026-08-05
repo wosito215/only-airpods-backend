@@ -104,3 +104,131 @@ table.admin-table input {
 .btn-logout { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 10px 18px; border-radius: 10px; cursor: pointer; }
 
 .stock-low { color: #e0245e; font-weight: 700; }
+
+.form-control-admin {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+.form-control-admin:focus { outline: none; border-color: var(--text-color); }
+
+/* ---------- AÑADIDOS: categorías, subida de imágenes, modal de edición ---------- */
+
+.admin-hint { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; line-height: 1.5; }
+
+.admin-inline-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.admin-inline-form .form-control-admin { flex: 1 1 260px; }
+
+.category-chip-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    padding: 7px 8px 7px 14px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+}
+.category-chip button {
+    background: var(--border-color);
+    border: none;
+    color: var(--text-color);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+.category-chip button:hover { background: #e0245e; color: white; }
+
+.featured-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+}
+.featured-check input { width: 16px; height: 16px; cursor: pointer; }
+
+.image-upload-block { margin-top: 5px; }
+.image-upload-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+
+.image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    max-width: 520px;
+}
+
+.image-slot {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+.image-slot.filled img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-slot-tag {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+.image-slot-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+.image-slot-remove:hover { background: #e0245e; }
+
+.image-slot.add-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 8px;
+    transition: 0.2s;
+}
+.image-slot.add-slot:hover { border-color: var(--text-color); color: var(--text-color); }
+
+.table-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--placeholder-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+.table-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+#edit-modal .admin-form-grid { margin-top: 10px; }

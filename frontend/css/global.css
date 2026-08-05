@@ -47,13 +47,14 @@ p.subtitle { font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-muted); marg
 
 /* --- NAVEGACIÓN --- */
 .fixed-nav { position: fixed; top: 0; width: 100%; height: 60px; background: var(--nav-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; padding: 0 5%; z-index: 1000; border-bottom: 1px solid var(--border-color); transition: background-color var(--transition-smooth); }
-.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand-logo { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: #ffffff; border: 1px solid var(--border-color); flex-shrink: 0; }
+.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+/* Logo un poco más grande que el texto "ONLY.AIRPODS" en escritorio */
+.brand-logo { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background: #ffffff; border: 1px solid var(--border-color); flex-shrink: 0; }
 .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; color: var(--text-color); text-decoration: none; }
 .nav-links { display: flex; gap: 30px; }
 .nav-links a { color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.3s ease; opacity: 0.6; }
 .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 600; }
-.nav-actions { display: flex; align-items: center; gap: 15px; }
+.nav-actions { display: flex; align-items: center; gap: 16px; }
 .search-box { display: flex; align-items: center; gap: 6px; background: var(--border-color); border-radius: 20px; padding: 5px 12px; }
 .search-box svg { flex-shrink: 0; opacity: 0.7; }
 .search-box input { background: transparent; border: none; color: var(--text-color); outline: none; width: 100px; font-size: 0.85rem; min-width: 0; }
@@ -122,17 +123,21 @@ p.subtitle { font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-muted); marg
 
 /* --- TABLET / MÓVIL GRANDE --- */
 @media (max-width: 768px) {
-    .fixed-nav { padding: 0 4%; }
+    .fixed-nav { padding: 0 4%; height: 64px; }
     .nav-brand { gap: 8px; }
-    .brand-logo { width: 30px; height: 30px; }
+    .brand-logo { width: 34px; height: 34px; }
     .logo { font-size: 1rem; letter-spacing: 1px; margin-right: 0; }
-    .nav-actions { gap: 8px; }
+    /* Un poco más de aire entre modo oscuro / buscador / carrito / menú,
+       para que no se sientan pegados si el usuario tiene la letra grande. */
+    .nav-actions { gap: 10px; }
+    .icon-btn { padding: 6px; border-radius: 8px; }
+    .menu-toggle { padding-left: 10px; margin-left: 2px; border-left: 1px solid var(--border-color); }
 
     .menu-toggle { display: flex; }
 
     .nav-links {
         position: fixed;
-        top: 60px;
+        top: 64px;
         left: 0;
         right: 0;
         flex-direction: column;
@@ -152,11 +157,11 @@ p.subtitle { font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-muted); marg
     .nav-links a:last-child { border-bottom: none; }
     .nav-links a:hover, .nav-links a.active { opacity: 1; }
 
-    .search-box { padding: 5px 10px; }
+    .search-box { padding: 6px 10px; }
     .search-box input { width: 60px; font-size: 0.8rem; }
     .search-box:focus-within input { width: 100px; }
 
-    .page-container { padding: 100px 6% 50px; }
+    .page-container { padding: 104px 6% 50px; }
     .footer { padding: 45px 6% 20px; }
     .footer-content { gap: 30px; }
 
@@ -167,9 +172,11 @@ p.subtitle { font-size: clamp(1rem, 3vw, 1.2rem); color: var(--text-muted); marg
 @media (max-width: 480px) {
     .search-box input { width: 46px; }
     .search-box:focus-within input { width: 90px; }
-    .nav-actions { gap: 6px; }
+    .nav-actions { gap: 7px; }
+    .icon-btn { padding: 5px; }
     .button-group { flex-direction: column; align-items: stretch; }
     .button-group .btn { text-align: center; }
     .side-panel { padding: 80px 20px 20px; }
     .form-control { font-size: 16px; } /* evita zoom automático en iOS al enfocar */
+    .footer-bottom { flex-direction: column; gap: 10px; }
 }

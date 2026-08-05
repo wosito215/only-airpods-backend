@@ -38,10 +38,8 @@
 
     <div class="catalog-header">
         <h1>Catálogo</h1>
-        <div class="filters">
+        <div class="filters" id="category-filters">
             <button class="filter-btn active" onclick="filterCategory('todos')">Todos</button>
-            <button class="filter-btn" onclick="filterCategory('airpods')">AirPods</button>
-            <button class="filter-btn" onclick="filterCategory('cases')">Cases</button>
         </div>
     </div>
 
@@ -55,12 +53,8 @@
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal()">✕</button>
             <div class="modal-gallery">
-                <div class="img-placeholder" style="height: 300px;">FOTO PRINCIPAL</div>
-                <div class="modal-thumbnails">
-                    <div class="img-placeholder">ANGULO 1</div>
-                    <div class="img-placeholder">ANGULO 2</div>
-                    <div class="img-placeholder">CAJA</div>
-                </div>
+                <div class="img-placeholder" id="modal-main-img" style="height: 300px;">FOTO PRINCIPAL</div>
+                <div class="modal-thumbnails" id="modal-thumbnails"></div>
             </div>
             <div class="modal-details">
                 <h2 id="modal-title">Nombre</h2>
@@ -101,7 +95,10 @@
                 <a href="https://www.instagram.com/elite.voleyclub" target="_blank" rel="noopener">Elite Club</a>
             </div>
         </div>
-        <p class="footer-bottom">© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
+        <div class="footer-bottom">
+        <p>© 2026 ONLY.AIRPODS · Santa Marta, Colombia</p>
+        <img src="img/logo.png" alt="Only.Airpods" class="footer-logo">
+    </div>
     </footer>
 
     <!-- PANEL LATERAL (CARRITO) -->
