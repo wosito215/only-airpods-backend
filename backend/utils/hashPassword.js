@@ -2,7 +2,7 @@
 // como ADMIN_PASSWORD_HASH (reemplaza a ADMIN_PASSWORD en texto plano).
 //
 // Uso:
-//   node utils/hashPassword.js "onlyairpods2211"
+//   node utils/hashPassword.js "TuContraseñaNueva"
 //
 // Copia el resultado y pégalo en tu .env local y en las variables de
 // entorno de Render como: ADMIN_PASSWORD_HASH=<resultado>
@@ -13,7 +13,7 @@ const bcrypt = require('bcryptjs');
 const plainPassword = process.argv[2];
 
 if (!plainPassword) {
-    console.log('Uso: node utils/hashPassword.js "onlyairpods2211"');
+    console.log('Uso: node utils/hashPassword.js "TuContraseñaNueva"');
     process.exit(1);
 }
 

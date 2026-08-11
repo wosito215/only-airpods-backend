@@ -51,8 +51,17 @@ const productSchema = new mongoose.Schema(
             type: [String],
             default: [],
             validate: {
-                validator: (arr) => Array.isArray(arr) && arr.length <= 4,
-                message: 'Un producto admite máximo 4 imágenes.',
+                validator: (arr) => {
+                    if (!Array.isArray(arr) || arr.length > 4) return false;
+                    // Cada imagen debe ser un Data URL de imagen real (jpg/png/webp)
+                    // y no pesar más de ~3MB ya codificada, para no inflar la base de datos.
+                    const validPattern = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+                    const MAX_LENGTH = 4 * 1024 * 1024; // ~3MB en bytes reales
+                    return arr.every(
+                        (img) => typeof img === 'string' && validPattern.test(img) && img.length <= MAX_LENGTH
+                    );
+                },
+                message: 'Cada imagen debe ser JPG/PNG/WEBP válida y pesar menos de ~3MB (máximo 4 imágenes).',
             },
         },
         // Se muestra en la sección "Destacados" de la pantalla principal.

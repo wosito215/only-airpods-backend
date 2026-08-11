@@ -6,13 +6,34 @@ const router = express.Router();
 
 // ---------- RUTAS PÚBLICAS (las usa el frontend/main.js) ----------
 
-// GET /api/products -> lista todos los productos activos
+// GET /api/products -> lista los productos activos
 // ?all=true (uso interno del admin) también trae los inactivos
+// ?page=1&limit=20 -> paginación (opcional; si no se envían, se comporta igual que antes)
 router.get('/', async (req, res) => {
     try {
         const filter = req.query.all === 'true' ? {} : { active: true };
-        const products = await Product.find(filter).sort({ createdAt: -1 });
-        res.json(products);
+
+        // Sin page/limit -> se mantiene el comportamiento original (trae todo).
+        if (!req.query.page && !req.query.limit) {
+            const products = await Product.find(filter).sort({ createdAt: -1 });
+            return res.json(products);
+        }
+
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+        const skip = (page - 1) * limit;
+
+        const [products, total] = await Promise.all([
+            Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Product.countDocuments(filter),
+        ]);
+
+        res.json({
+            products,
+            page,
+            totalPages: Math.ceil(total / limit),
+            totalProducts: total,
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los productos.', error: error.message });
     }

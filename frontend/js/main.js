@@ -171,7 +171,7 @@ function openProductModal(productId) {
     } else {
         addBtn.innerText = 'Añadir al Carrito';
         addBtn.disabled = false;
-        addBtn.onclick = function() { addToCart(product.name, product.price); closeModal(); };
+        addBtn.onclick = function() { addToCart(product.id, product.name, product.price); closeModal(); };
     }
 
     document.getElementById('product-modal').classList.add('active');
@@ -228,12 +228,12 @@ let cart = JSON.parse(localStorage.getItem('onlyAirpodsCart')) || [];
 function saveCart() { localStorage.setItem('onlyAirpodsCart', JSON.stringify(cart)); }
 function toggleCart() { document.getElementById('cart-panel').classList.toggle('open'); }
 
-function addToCart(productName, price) {
+function addToCart(productId, productName, price) {
     let existingItem = cart.find(item => item.name === productName);
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
-        cart.push({ name: productName, price: price, quantity: 1 });
+        cart.push({ id: productId, name: productName, price: price, quantity: 1 });
     }
     saveCart(); 
     updateCartUI();
@@ -330,10 +330,33 @@ function processOrder(e) {
     message += `Métodos de pago:\n${payment}`;
     
     const phoneNumber = "573189461172"; 
+
+    // Registra el pedido en el backend (para historial de ventas) y luego
+    // abre WhatsApp. Si el registro falla (sin internet, backend caído),
+    // igual dejamos que el pedido se envíe por WhatsApp para no perder la venta.
+    const orderPayload = {
+        items: cart.map(item => ({
+            productId: item.id || item.name,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+        })),
+        total: totalOrder,
+        customerName: name,
+        customerPhone: phone,
+        notes: `Dirección: ${address} | Pago: ${payment}`,
+    };
+
+    fetch(`${API_BASE_URL}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload),
+    }).catch(err => console.error('No se pudo registrar el pedido en el historial:', err));
+
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
     
-    // Opcional: Vaciar el carrito después de enviar
-    // cart = []; saveCart(); updateCartUI(); 
+    // Vacía el carrito después de enviar el pedido.
+    cart = []; saveCart(); updateCartUI();
     closeCheckoutModal();
 }
 
