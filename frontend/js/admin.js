@@ -20,6 +20,7 @@ function showDashboard() {
     document.getElementById('dashboard-screen').style.display = 'block';
     loadCategories();
     loadProductsTable();
+    loadOrders();
 }
 function showLogin() {
     document.getElementById('login-screen').style.display = 'block';
@@ -443,6 +444,89 @@ async function createProduct() {
         loadProductsTable();
     } catch (error) {
         errorEl.innerText = error.message || 'Error al crear el producto.';
+    }
+}
+
+// =====================================================================
+// PEDIDOS (historial de ventas)
+// =====================================================================
+
+const ORDER_STATUSES = ['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'];
+
+function formatOrderDate(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+async function loadOrders() {
+    const tbody = document.getElementById('orders-table-body');
+    const errorEl = document.getElementById('orders-error');
+    const emptyEl = document.getElementById('orders-empty');
+    errorEl.innerText = '';
+
+    const statusFilter = document.getElementById('orders-status-filter').value;
+    const url = statusFilter
+        ? `${API_BASE_URL}/orders?status=${encodeURIComponent(statusFilter)}`
+        : `${API_BASE_URL}/orders`;
+
+    try {
+        const res = await authFetch(url);
+        const orders = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = orders.message || 'No se pudieron cargar los pedidos.';
+            return;
+        }
+
+        emptyEl.style.display = orders.length === 0 ? 'block' : 'none';
+
+        tbody.innerHTML = orders.map(order => {
+            const productsSummary = order.items
+                .map(item => `${item.quantity}x ${item.name}`)
+                .join('<br>');
+
+            const statusOptions = ORDER_STATUSES.map(status =>
+                `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status.charAt(0).toUpperCase() + status.slice(1)}</option>`
+            ).join('');
+
+            return `
+                <tr data-order-id="${order._id}">
+                    <td>${formatOrderDate(order.createdAt)}</td>
+                    <td>${order.customerName || '—'}</td>
+                    <td>${order.customerPhone || '—'}</td>
+                    <td>${productsSummary}</td>
+                    <td>$${Number(order.total).toLocaleString()}</td>
+                    <td>
+                        <select class="form-control-admin" onchange="updateOrderStatus('${order._id}', this.value)">
+                            ${statusOptions}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        errorEl.innerText = error.message || 'No se pudieron cargar los pedidos.';
+    }
+}
+
+async function updateOrderStatus(orderId, status) {
+    const errorEl = document.getElementById('orders-error');
+    errorEl.innerText = '';
+
+    try {
+        const res = await authFetch(`${API_BASE_URL}/orders/${orderId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.innerText = data.message || 'No se pudo actualizar el estado del pedido.';
+            loadOrders();
+        }
+    } catch (error) {
+        errorEl.innerText = error.message || 'No se pudo actualizar el estado del pedido.';
+        loadOrders();
     }
 }
 

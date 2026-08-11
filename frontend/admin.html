@@ -93,6 +93,42 @@
             </div>
             <p class="admin-error" id="table-error"></p>
         </div>
+
+        <!-- ---------- PEDIDOS ---------- -->
+        <div class="admin-card">
+            <h3>Pedidos</h3>
+            <p class="admin-hint">Cada pedido que un cliente envía por WhatsApp queda registrado aquí para que lleves el historial de ventas.</p>
+            <div class="admin-inline-form">
+                <select id="orders-status-filter" class="form-control-admin" onchange="loadOrders()">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="enviado">Enviado</option>
+                    <option value="entregado">Entregado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+                <button class="btn-small" style="background:var(--border-color); color:var(--text-color);" onclick="loadOrders()">↻ Actualizar</button>
+            </div>
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- admin.js llena esto dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <p class="admin-hint" id="orders-empty" style="display:none;">Todavía no hay pedidos registrados.</p>
+            <p class="admin-error" id="orders-error"></p>
+        </div>
     </div>
 
     <!-- ---------- MODAL: EDITAR PRODUCTO (nombre, desc, categoría, imágenes, caja) ---------- -->
