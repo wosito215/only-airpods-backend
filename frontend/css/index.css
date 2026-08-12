@@ -4,7 +4,7 @@
 .hero-content { flex: 1 1 480px; max-width: 560px; text-align: left; }
 .hero-tagline { font-size: 1.35rem; font-weight: 600; color: var(--text-color); margin-bottom: 12px; line-height: 1.4; }
 .hero-content p.subtitle { margin-bottom: 30px; }
-.hero-visual { flex: 1 1 340px; max-width: 380px; color: var(--text-color); }
+.hero-visual { flex: 1 1 440px; max-width: 500px; color: var(--text-color); }
 .hero-visual img,
 .hero-visual svg { width: 100%; height: auto; display: block; }
 .hero-visual img { object-fit: contain; max-width: 100%; filter: drop-shadow(0 25px 35px rgba(0,0,0,0.25)); }
