@@ -7,7 +7,7 @@
 .hero-visual { flex: 1 1 340px; max-width: 380px; color: var(--text-color); }
 .hero-visual img,
 .hero-visual svg { width: 100%; height: auto; display: block; }
-.hero-visual img { object-fit: contain; max-width: 100%; }
+.hero-visual img { object-fit: contain; max-width: 100%; filter: drop-shadow(0 25px 35px rgba(0,0,0,0.25)); }
 .button-group { display: flex; gap: 15px; justify-content: flex-start; margin-top: 20px; }
 .featured-section { padding: 100px 5%; text-align: center; background: var(--bg-color); }
 .featured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px; margin-top: 50px; max-width: 1200px; margin-left: auto; margin-right: auto; }
@@ -23,7 +23,11 @@
 @media (max-width: 900px) {
     .hero-section { flex-direction: column-reverse; text-align: center; min-height: auto; padding-top: 110px; }
     .hero-content { text-align: center; max-width: 100%; }
-    .hero-visual { max-width: 100%; width: 100%; }
-    .hero-visual img { object-fit: contain; max-width: 100%; }
+    .hero-visual { max-width: 280px; width: 80%; margin: 0 auto; }
+    .hero-visual img { object-fit: contain; max-width: 100%; height: auto; }
     .button-group { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+    .hero-visual { max-width: 220px; width: 70%; }
 }
