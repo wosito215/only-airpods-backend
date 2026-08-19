@@ -232,3 +232,87 @@ table.admin-table input {
 .table-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
 #edit-modal .admin-form-grid { margin-top: 10px; }
+
+/* ---------- AÑADIDOS: variantes de color ---------- */
+
+.colors-block { margin-top: 18px; }
+
+.colors-section {
+    margin-top: 12px;
+    padding: 15px;
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+}
+
+.color-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.color-add-form .form-control-admin { flex: 1 1 180px; }
+
+.color-hex-input {
+    width: 44px;
+    height: 40px;
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    cursor: pointer;
+}
+
+.color-photo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.color-photo-btn:hover { border-color: var(--text-color); color: var(--text-color); }
+.color-photo-btn.has-photo { border-style: solid; border-color: #17bf63; color: #17bf63; }
+
+.color-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+
+.color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    padding: 6px 8px 6px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+.color-chip-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.color-chip-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.color-chip-name { white-space: nowrap; }
+
+.table-color-dots { display: flex; gap: 4px; flex-wrap: wrap; max-width: 100px; }
+.table-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    display: inline-block;
+}

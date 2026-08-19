@@ -54,17 +54,20 @@ function renderCatalog(products) {
 
     grid.innerHTML = products.map(product => {
         const mainImage = product.images && product.images.length > 0 ? product.images[0] : '';
+        const outOfStock = product.stock <= 0;
         return `
-        <div class="product-item" data-category="${product.category}" onclick="openProductModal('${product.id}')">
-            <div class="img-placeholder">
-                ${mainImage ? `<img src="${mainImage}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">` : 'FOTO PRODUCTO'}
+        <div class="product-item ${outOfStock ? 'out-of-stock' : ''}" data-category="${product.category}" onclick="openProductModal('${product.id}')">
+            <div class="product-item-fade">
+                <div class="img-placeholder">
+                    ${mainImage ? `<img src="${mainImage}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">` : 'FOTO PRODUCTO'}
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p>${product.desc || ''}</p>
+                    <span class="price">$${product.price.toLocaleString()}</span>
+                </div>
             </div>
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.desc || ''}</p>
-                <span class="price">$${product.price.toLocaleString()}</span>
-                ${product.stock <= 0 ? '<span class="stock-badge" style="display:block;color:#e0245e;font-size:0.85rem;margin-top:5px;">Agotado</span>' : ''}
-            </div>
+            ${outOfStock ? '<span class="stock-badge-out">Agotado</span>' : ''}
         </div>
         `;
     }).join('');
@@ -157,6 +160,7 @@ function openProductModal(productId) {
     document.getElementById('modal-desc').innerText = product.desc;
 
     renderModalGallery(product.images || []);
+    renderColorPicker(product);
 
     const boxList = document.getElementById('modal-box-list');
     if (boxList) {
@@ -171,12 +175,78 @@ function openProductModal(productId) {
     } else {
         addBtn.innerText = 'Añadir al Carrito';
         addBtn.disabled = false;
-        addBtn.onclick = function() { addToCart(product.id, product.name, product.price); closeModal(); };
+        addBtn.onclick = function() {
+            const hasColorOptions = product.hasColors && (product.colors || []).length > 0;
+            const selectedIndex = window.__selectedModalColorIndex;
+
+            // Si el producto tiene colores, exigimos elegir uno antes de
+            // añadir al carrito, para que el pedido salga sin ambigüedad.
+            if (hasColorOptions && selectedIndex === null) {
+                alert('Elige un color antes de añadir el producto al carrito.');
+                return;
+            }
+
+            const chosenColor = hasColorOptions ? product.colors[selectedIndex] : null;
+            const cartName = chosenColor ? `${product.name} - ${chosenColor.name}` : product.name;
+
+            addToCart(product.id, cartName, product.price);
+            closeModal();
+        };
     }
 
     document.getElementById('product-modal').classList.add('active');
 }
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
+
+// --- SELECTOR DE COLOR DEL MODAL ---
+// Pinta los circulitos de color (usando el hex guardado en el admin) al lado
+// de los detalles del producto. Al elegir uno, se cambia la foto principal
+// por la foto de ese color específico.
+function renderColorPicker(product) {
+    const wrap = document.getElementById('modal-color-picker');
+    const swatchesEl = document.getElementById('modal-color-swatches');
+    const nameEl = document.getElementById('modal-color-selected-name');
+    if (!wrap || !swatchesEl) return;
+
+    window.__currentModalColors = product.colors || [];
+    window.__selectedModalColorIndex = null;
+    if (nameEl) nameEl.textContent = '';
+
+    if (!product.hasColors || !product.colors || product.colors.length === 0) {
+        wrap.style.display = 'none';
+        swatchesEl.innerHTML = '';
+        return;
+    }
+
+    wrap.style.display = 'flex';
+    swatchesEl.innerHTML = product.colors.map((c, index) => `
+        <button type="button" class="color-swatch" style="background-color:${c.hex || '#cccccc'};" title="${c.name}" aria-label="Color ${c.name}" onclick="selectModalColor(${index})"></button>
+    `).join('');
+}
+
+function selectModalColor(index) {
+    const colors = window.__currentModalColors || [];
+    const color = colors[index];
+    if (!color) return;
+
+    window.__selectedModalColorIndex = index;
+
+    document.querySelectorAll('#modal-color-swatches .color-swatch').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+    });
+
+    const nameEl = document.getElementById('modal-color-selected-name');
+    if (nameEl) nameEl.textContent = color.name || '';
+
+    if (color.image) {
+        document.getElementById('modal-main-img').innerHTML =
+            `<img src="${color.image}" alt="${color.name || 'Color'}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`;
+
+        // La foto principal ahora muestra el color elegido, así que quitamos
+        // el resaltado de las miniaturas genéricas para no confundir.
+        document.querySelectorAll('#modal-thumbnails .modal-thumb').forEach(el => el.classList.remove('active'));
+    }
+}
 
 // Pinta la foto principal + miniaturas del modal con las imágenes reales del
 // producto (subidas desde el admin). Si no hay fotos, muestra el placeholder.
@@ -220,6 +290,12 @@ function setModalMainImage(index) {
     document.querySelectorAll('#modal-thumbnails .modal-thumb').forEach((el, i) => {
         el.classList.toggle('active', i === Number(index));
     });
+
+    // Volvemos a una foto genérica, así que quitamos cualquier color activo.
+    window.__selectedModalColorIndex = null;
+    document.querySelectorAll('#modal-color-swatches .color-swatch').forEach(el => el.classList.remove('active'));
+    const colorNameEl = document.getElementById('modal-color-selected-name');
+    if (colorNameEl) colorNameEl.textContent = '';
 }
 
 // --- CARRITO DE COMPRAS AVANZADO ---

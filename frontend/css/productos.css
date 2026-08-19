@@ -27,6 +27,43 @@
 .modal-box-contents ul { list-style: none; font-size: 0.9rem; margin-bottom: 20px;}
 .modal-box-contents ul li { padding: 8px 0; border-bottom: 1px solid var(--border-color); }
 
+/* Selector de color dentro del modal de producto */
+.modal-color-picker { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.modal-color-label { font-size: 0.9rem; color: var(--text-muted); }
+.modal-color-label strong { color: var(--text-color); }
+.modal-color-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 0 0 2px transparent;
+    transition: 0.2s;
+}
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.active { border-color: var(--bg-color); box-shadow: 0 0 0 2px var(--text-color); }
+
+/* Tarjeta de producto agotado: se atenúa la foto y el texto, pero la
+   etiqueta "Agotado" se mantiene bien visible para que la persona sepa
+   que igual vendemos ese producto (solo que hay que esperar reposición). */
+.product-item.out-of-stock { cursor: pointer; }
+.product-item-fade { transition: opacity 0.3s; }
+.product-item.out-of-stock .product-item-fade { opacity: 0.4; }
+.stock-badge-out {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #e0245e;
+    background: rgba(224, 36, 94, 0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
 @media (max-width: 768px) {
     .catalog-header { padding: 100px 6% 30px; }
     .catalog-grid { padding: 40px 6%; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }

@@ -174,6 +174,104 @@ function removeImage(key, index) {
 }
 
 // =====================================================================
+// COLORES (variantes de un mismo producto: nombre + código hex + foto)
+// =====================================================================
+
+// Guarda en memoria los colores de cada formulario (new / edit), igual que imageState.
+const colorState = {
+    new: [],
+    edit: [],
+};
+
+// Guarda la foto ya comprimida que el usuario seleccionó para el color que
+// está a punto de añadir (antes de darle clic a "Añadir color").
+const pendingColorPhoto = {
+    new: null,
+    edit: null,
+};
+
+function toggleColorsSection(key) {
+    const checked = document.getElementById(`${key}-has-colors`).checked;
+    document.getElementById(`${key}-colors-section`).style.display = checked ? 'block' : 'none';
+}
+
+async function handleColorPhotoSelect(key, event) {
+    const file = event.target.files && event.target.files[0];
+    event.target.value = ''; // permite volver a elegir el mismo archivo después
+    if (!file) return;
+
+    const errorEl = document.getElementById(`${key}-color-error`);
+    try {
+        pendingColorPhoto[key] = await compressImage(file);
+        const label = document.getElementById(`${key}-color-photo-label`);
+        if (label) label.classList.add('has-photo');
+        if (errorEl) errorEl.innerText = '';
+    } catch (error) {
+        if (errorEl) errorEl.innerText = 'No se pudo procesar la foto de ese color.';
+    }
+}
+
+function addColorVariant(key) {
+    const errorEl = document.getElementById(`${key}-color-error`);
+    errorEl.innerText = '';
+
+    const nameInput = document.getElementById(`${key}-color-name`);
+    const hexInput = document.getElementById(`${key}-color-hex`);
+    const name = nameInput.value.trim();
+    const hex = hexInput.value;
+    const image = pendingColorPhoto[key];
+
+    if (!name) {
+        errorEl.innerText = 'Escribe el nombre del color (ej: Azul).';
+        return;
+    }
+    if (!image) {
+        errorEl.innerText = 'Sube una foto del producto en ese color.';
+        return;
+    }
+    if (colorState[key].length >= 8) {
+        errorEl.innerText = 'Máximo 8 colores por producto.';
+        return;
+    }
+
+    colorState[key].push({ name, hex, image });
+
+    // Limpia el mini-formulario para el siguiente color
+    nameInput.value = '';
+    hexInput.value = '#1d4ed8';
+    pendingColorPhoto[key] = null;
+    const label = document.getElementById(`${key}-color-photo-label`);
+    if (label) label.classList.remove('has-photo');
+
+    renderColorList(key);
+}
+
+function removeColorVariant(key, index) {
+    colorState[key].splice(index, 1);
+    renderColorList(key);
+}
+
+function renderColorList(key) {
+    const container = document.getElementById(`${key}-color-list`);
+    if (!container) return;
+    const colors = colorState[key];
+
+    if (colors.length === 0) {
+        container.innerHTML = '<p class="admin-hint" style="margin-bottom:10px;">Aún no has añadido colores para este producto.</p>';
+        return;
+    }
+
+    container.innerHTML = colors.map((c, index) => `
+        <div class="color-chip">
+            <span class="color-chip-dot" style="background-color:${c.hex};"></span>
+            <img class="color-chip-thumb" src="${c.image}" alt="${c.name}">
+            <span class="color-chip-name">${c.name}</span>
+            <button type="button" class="image-slot-remove" onclick="removeColorVariant('${key}', ${index})" title="Quitar color">✕</button>
+        </div>
+    `).join('');
+}
+
+// =====================================================================
 // CATEGORÍAS
 // =====================================================================
 
@@ -303,6 +401,11 @@ async function loadProductsTable() {
                 <td><input type="number" value="${product.price}" data-field="price"></td>
                 <td><input type="number" value="${product.stock}" data-field="stock" class="${product.stock <= 3 ? 'stock-low' : ''}"></td>
                 <td>${(categoriesCache.find(c => c.id === product.category) || {}).name || product.category}</td>
+                <td>
+                    ${product.hasColors && product.colors && product.colors.length > 0
+                        ? `<div class="table-color-dots">${product.colors.map(c => `<span class="table-color-dot" style="background-color:${c.hex};" title="${c.name}"></span>`).join('')}</div>`
+                        : '—'}
+                </td>
                 <td style="text-align:center;">
                     <input type="checkbox" ${product.featured ? 'checked' : ''} onchange="toggleFeatured('${product.id}', this.checked)">
                 </td>
@@ -412,6 +515,8 @@ async function createProduct() {
         .map(item => item.trim())
         .filter(Boolean);
     const images = imageState.new;
+    const hasColors = document.getElementById('new-has-colors').checked;
+    const colors = colorState.new;
 
     if (!id || !name || !price || stock === undefined || Number.isNaN(price)) {
         errorEl.innerText = 'Completa al menos: id, nombre, precio y stock.';
@@ -421,11 +526,15 @@ async function createProduct() {
         errorEl.innerText = 'Crea al menos una categoría antes de añadir productos.';
         return;
     }
+    if (hasColors && colors.length === 0) {
+        errorEl.innerText = 'Marcaste que tiene varios colores: añade al menos un color, o desmarca la casilla.';
+        return;
+    }
 
     try {
         const res = await authFetch(`${API_BASE_URL}/products`, {
             method: 'POST',
-            body: JSON.stringify({ id, name, price, stock, category, featured, desc, box, images }),
+            body: JSON.stringify({ id, name, price, stock, category, featured, desc, box, images, hasColors, colors: hasColors ? colors : [] }),
         });
         const data = await res.json();
 
@@ -441,6 +550,11 @@ async function createProduct() {
         document.getElementById('new-featured').checked = false;
         imageState.new = [];
         renderImageGrid('new');
+        document.getElementById('new-has-colors').checked = false;
+        colorState.new = [];
+        pendingColorPhoto.new = null;
+        renderColorList('new');
+        toggleColorsSection('new');
         loadProductsTable();
     } catch (error) {
         errorEl.innerText = error.message || 'Error al crear el producto.';
@@ -552,6 +666,13 @@ function openEditModal(id) {
     imageState.edit = [...(product.images || [])];
     renderImageGrid('edit');
 
+    document.getElementById('edit-has-colors').checked = !!product.hasColors;
+    colorState.edit = (product.colors || []).map(c => ({ ...c }));
+    pendingColorPhoto.edit = null;
+    renderColorList('edit');
+    toggleColorsSection('edit');
+    document.getElementById('edit-color-error').innerText = '';
+
     document.getElementById('edit-error').innerText = '';
     document.getElementById('edit-modal').classList.add('active');
 }
@@ -576,16 +697,22 @@ async function saveProductFull() {
         .map(item => item.trim())
         .filter(Boolean);
     const images = imageState.edit;
+    const hasColors = document.getElementById('edit-has-colors').checked;
+    const colors = colorState.edit;
 
     if (!name || !price || Number.isNaN(price)) {
         errorEl.innerText = 'Completa al menos: nombre y precio.';
+        return;
+    }
+    if (hasColors && colors.length === 0) {
+        errorEl.innerText = 'Marcaste que tiene varios colores: añade al menos un color, o desmarca la casilla.';
         return;
     }
 
     try {
         const res = await authFetch(`${API_BASE_URL}/products/${id}`, {
             method: 'PUT',
-            body: JSON.stringify({ name, price, stock, category, featured, desc, box, images }),
+            body: JSON.stringify({ name, price, stock, category, featured, desc, box, images, hasColors, colors: hasColors ? colors : [] }),
         });
         const data = await res.json();
 
@@ -609,6 +736,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderImageGrid('new');
     renderImageGrid('edit');
+    renderColorList('new');
+    renderColorList('edit');
 
     // Si ya hay un token guardado en esta pestaña, entra directo al dashboard
     if (getToken()) {

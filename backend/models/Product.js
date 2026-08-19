@@ -64,6 +64,42 @@ const productSchema = new mongoose.Schema(
                 message: 'Cada imagen debe ser JPG/PNG/WEBP válida y pesar menos de ~3MB (máximo 4 imágenes).',
             },
         },
+        // Marca si este producto tiene variantes de color (ej: un case que
+        // viene en varios colores). Si es true, "colors" trae las opciones.
+        hasColors: {
+            type: Boolean,
+            default: false,
+        },
+        // Cada color: nombre (ej "Azul"), código hex (para el circulito de
+        // color) y su propia foto (Data URL base64, igual que "images").
+        // Así un solo producto cubre todos sus colores, en vez de crear
+        // un producto repetido por cada color.
+        colors: {
+            type: [
+                {
+                    name: { type: String, trim: true },
+                    hex: { type: String, trim: true },
+                    image: { type: String },
+                },
+            ],
+            default: [],
+            validate: {
+                validator: (arr) => {
+                    if (!Array.isArray(arr) || arr.length > 8) return false;
+                    const hexPattern = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+                    const imgPattern = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+                    const MAX_LENGTH = 4 * 1024 * 1024; // ~3MB en bytes reales
+                    return arr.every(
+                        (c) =>
+                            c &&
+                            typeof c.name === 'string' && c.name.trim().length > 0 &&
+                            typeof c.hex === 'string' && hexPattern.test(c.hex) &&
+                            typeof c.image === 'string' && imgPattern.test(c.image) && c.image.length <= MAX_LENGTH
+                    );
+                },
+                message: 'Cada color necesita nombre, código de color (#RRGGBB) y una foto JPG/PNG/WEBP válida de menos de ~3MB (máximo 8 colores).',
+            },
+        },
         // Se muestra en la sección "Destacados" de la pantalla principal.
         featured: {
             type: Boolean,

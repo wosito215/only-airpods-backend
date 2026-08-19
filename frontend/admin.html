@@ -63,6 +63,26 @@
                 <p class="admin-hint" style="margin-top:8px;">La primera foto que subas será la foto principal del catálogo.</p>
             </div>
 
+            <div class="colors-block full-width">
+                <label class="featured-check">
+                    <input type="checkbox" id="new-has-colors" onchange="toggleColorsSection('new')">
+                    Este producto tiene varios colores (ej: un case en varios colores)
+                </label>
+                <div class="colors-section" id="new-colors-section" style="display:none;">
+                    <div class="color-list" id="new-color-list"></div>
+                    <div class="color-add-form">
+                        <input type="text" id="new-color-name" class="form-control-admin" placeholder="Nombre del color (ej: Azul)">
+                        <input type="color" id="new-color-hex" class="color-hex-input" value="#1d4ed8" title="Código del color">
+                        <label class="color-photo-btn" id="new-color-photo-label">+ Foto del color
+                            <input type="file" accept="image/*" id="new-color-photo" hidden onchange="handleColorPhotoSelect('new', event)">
+                        </label>
+                        <button type="button" class="btn-small btn-save" onclick="addColorVariant('new')">Añadir color</button>
+                    </div>
+                    <p class="admin-hint">Cada color necesita un nombre, su código de color y una foto del producto en ese color. Así aparecerá el circulito de color para que el cliente elija.</p>
+                    <p class="admin-error" id="new-color-error"></p>
+                </div>
+            </div>
+
             <button class="btn-small btn-save" onclick="createProduct()" style="margin-top:15px;">+ Crear producto</button>
             <p class="admin-error" id="create-error"></p>
             <p class="admin-success" id="create-success"></p>
@@ -81,6 +101,7 @@
                             <th>Precio</th>
                             <th>Stock</th>
                             <th>Categoría</th>
+                            <th>Colores</th>
                             <th>Destacado</th>
                             <th>Activo</th>
                             <th>Acciones</th>
@@ -153,6 +174,26 @@
             <div class="image-upload-block full-width">
                 <label class="image-upload-label">Fotos del producto (hasta 4)</label>
                 <div class="image-upload-grid" id="edit-image-grid"></div>
+            </div>
+
+            <div class="colors-block full-width">
+                <label class="featured-check">
+                    <input type="checkbox" id="edit-has-colors" onchange="toggleColorsSection('edit')">
+                    Este producto tiene varios colores (ej: un case en varios colores)
+                </label>
+                <div class="colors-section" id="edit-colors-section" style="display:none;">
+                    <div class="color-list" id="edit-color-list"></div>
+                    <div class="color-add-form">
+                        <input type="text" id="edit-color-name" class="form-control-admin" placeholder="Nombre del color (ej: Azul)">
+                        <input type="color" id="edit-color-hex" class="color-hex-input" value="#1d4ed8" title="Código del color">
+                        <label class="color-photo-btn" id="edit-color-photo-label">+ Foto del color
+                            <input type="file" accept="image/*" id="edit-color-photo" hidden onchange="handleColorPhotoSelect('edit', event)">
+                        </label>
+                        <button type="button" class="btn-small btn-save" onclick="addColorVariant('edit')">Añadir color</button>
+                    </div>
+                    <p class="admin-hint">Cada color necesita un nombre, su código de color y una foto del producto en ese color.</p>
+                    <p class="admin-error" id="edit-color-error"></p>
+                </div>
             </div>
 
             <button class="btn-small btn-save" onclick="saveProductFull()" style="margin-top:15px;">Guardar cambios</button>

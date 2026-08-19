@@ -55,7 +55,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/products -> crear producto nuevo
 router.post('/', requireAuth, async (req, res) => {
     try {
-        const { id, name, price, desc, box, category, stock, images, featured } = req.body;
+        const { id, name, price, desc, box, category, stock, images, featured, hasColors, colors } = req.body;
 
         if (!id || !name || price === undefined || stock === undefined) {
             return res.status(400).json({ message: 'Faltan campos obligatorios: id, name, price, stock.' });
@@ -63,6 +63,10 @@ router.post('/', requireAuth, async (req, res) => {
 
         if (images && Array.isArray(images) && images.length > 4) {
             return res.status(400).json({ message: 'Un producto admite máximo 4 imágenes.' });
+        }
+
+        if (colors && Array.isArray(colors) && colors.length > 8) {
+            return res.status(400).json({ message: 'Un producto admite máximo 8 colores.' });
         }
 
         const exists = await Product.findOne({ id: id.toLowerCase().trim() });
@@ -74,6 +78,8 @@ router.post('/', requireAuth, async (req, res) => {
             id, name, price, desc, box, category, stock,
             images: images || [],
             featured: !!featured,
+            hasColors: !!hasColors,
+            colors: colors || [],
         });
         res.status(201).json(product);
     } catch (error) {
@@ -88,6 +94,10 @@ router.put('/:id', requireAuth, async (req, res) => {
 
         if (updates.images && Array.isArray(updates.images) && updates.images.length > 4) {
             return res.status(400).json({ message: 'Un producto admite máximo 4 imágenes.' });
+        }
+
+        if (updates.colors && Array.isArray(updates.colors) && updates.colors.length > 8) {
+            return res.status(400).json({ message: 'Un producto admite máximo 8 colores.' });
         }
 
         const product = await Product.findOneAndUpdate(
